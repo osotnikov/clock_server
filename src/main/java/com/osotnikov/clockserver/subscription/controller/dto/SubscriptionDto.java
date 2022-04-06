@@ -5,13 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.URL;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class SubscriptionDto {
-    //@Pattern(regexp = "")
+    @URL(regexp = "^(http|https).*")
     private String postbackUrl;
     @PostbackFrequencyConstraint
     private FrequencyDto frequency;

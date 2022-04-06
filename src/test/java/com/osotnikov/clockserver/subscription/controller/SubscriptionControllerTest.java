@@ -52,7 +52,7 @@ public class SubscriptionControllerTest {
     }
 
     @Test
-    public void givenInvalidFrequency_whenUserCreatesNewSubscription_then400() throws Exception {
+    public void givenInvalidFrequencyUnderMin_whenUserCreatesNewSubscription_then400() throws Exception {
         SubscriptionDto subscriptionDto = new SubscriptionDto("http://some.postback/url",
             new FrequencyDto(0, 0, 2));
 
@@ -60,6 +60,51 @@ public class SubscriptionControllerTest {
             post("/subscription")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectWriter.writeValueAsString(subscriptionDto)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().json("{}"));
+    }
+
+    @Test
+    public void givenInvalidFrequencyOverMax_whenUserCreatesNewSubscription_then400() throws Exception {
+        SubscriptionDto subscriptionDto = new SubscriptionDto("http://some.postback/url",
+            new FrequencyDto(4, 0, 2));
+
+        this.mockMvc.perform(
+                post("/subscription")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectWriter.writeValueAsString(subscriptionDto)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().json("{}"));
+    }
+
+    @Test
+    public void givenInvalidFrequencyNegative_whenUserCreatesNewSubscription_then400() throws Exception {
+        SubscriptionDto subscriptionDto = new SubscriptionDto("http://some.postback/url",
+            new FrequencyDto(3, -2, 6));
+
+        this.mockMvc.perform(
+                post("/subscription")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectWriter.writeValueAsString(subscriptionDto)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().json("{}"));
+    }
+
+    @Test
+    public void givenInvalidPostbackUrl_whenUserCreatesNewSubscription_then400() throws Exception {
+        SubscriptionDto subscriptionDto = new SubscriptionDto("ptth://some.postback/url",
+            new FrequencyDto(0, 0, 6));
+
+        this.mockMvc.perform(
+                post("/subscription")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectWriter.writeValueAsString(subscriptionDto)))
             .andDo(print())
             .andExpect(status().isBadRequest())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))

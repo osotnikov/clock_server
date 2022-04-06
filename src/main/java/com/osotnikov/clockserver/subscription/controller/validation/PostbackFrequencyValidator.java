@@ -15,9 +15,10 @@ public class PostbackFrequencyValidator implements ConstraintValidator<PostbackF
 	public boolean isValid(FrequencyDto frequencyString,
 						   ConstraintValidatorContext cxt) {
 
-		if(frequencyString.getHours() > 4 ||
+		if((frequencyString.getHours() < 0 || frequencyString.getMinutes() < 0 || frequencyString.getSeconds() < 0) ||
+		   (frequencyString.getHours() > 4) ||
 		   (frequencyString.getHours() == 4 && (frequencyString.getMinutes() > 0 || frequencyString.getSeconds() > 0)) ||
-		   frequencyString.getHours() <= 0 && frequencyString.getMinutes() <= 0 && frequencyString.getSeconds() <= 6) {
+		   (frequencyString.getHours() == 0 && frequencyString.getMinutes() == 0 && frequencyString.getSeconds() < 5)) {
 			return false;
 		}
 		return true;
