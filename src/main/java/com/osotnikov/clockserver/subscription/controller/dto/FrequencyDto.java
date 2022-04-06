@@ -1,4 +1,4 @@
-package com.osotnikov.subscription.controller.dto;
+package com.osotnikov.clockserver.subscription.controller.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SubscriptionDto {
-    private String postbackUrl;
-    private String frequency;
+public class FrequencyDto {
+	private int hours;
+	private int minutes;
+	private int seconds;
 }

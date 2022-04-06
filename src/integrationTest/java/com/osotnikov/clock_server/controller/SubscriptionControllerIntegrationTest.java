@@ -1,8 +1,9 @@
 package com.osotnikov.clock_server.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.osotnikov.subscription.controller.dto.SubscriptionDto;
-import com.osotnikov.subscription.controller.dto.SubscriptionPatchDto;
+import com.osotnikov.clockserver.subscription.controller.dto.FrequencyDto;
+import com.osotnikov.clockserver.subscription.controller.dto.SubscriptionDto;
+import com.osotnikov.clockserver.subscription.controller.dto.SubscriptionPatchDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +60,7 @@ public class SubscriptionControllerIntegrationTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post("/subscription")
-					.content(asJsonString(new SubscriptionDto(postbackUrl, "5m2s")))
+					.content(asJsonString(new SubscriptionDto(postbackUrl, new FrequencyDto(0, 0, 5))))
 					.contentType(MediaType.APPLICATION_JSON)
 					.accept(MediaType.APPLICATION_JSON)
 			)
@@ -87,7 +88,7 @@ public class SubscriptionControllerIntegrationTest {
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.patch("/subscription")
 					.accept(MediaType.APPLICATION_JSON)
-					.content(asJsonString(new SubscriptionPatchDto("5s")))
+					.content(asJsonString(new SubscriptionPatchDto(new FrequencyDto(0, 0, 5))))
 					.contentType(MediaType.APPLICATION_JSON)
 					.accept(MediaType.APPLICATION_JSON)
 			)
@@ -101,7 +102,7 @@ public class SubscriptionControllerIntegrationTest {
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.put("/subscription")
 					.accept(MediaType.APPLICATION_JSON)
-					.content(asJsonString(new SubscriptionDto(postbackUrl, "5s")))
+					.content(asJsonString(new SubscriptionDto(postbackUrl, new FrequencyDto(0, 0, 5))))
 					.contentType(MediaType.APPLICATION_JSON)
 					.accept(MediaType.APPLICATION_JSON)
 			)

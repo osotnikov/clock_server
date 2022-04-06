@@ -1,4 +1,4 @@
-package com.osotnikov.subscription.controller.dto;
+package com.osotnikov.clockserver.subscription.controller.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,5 +14,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class SubscriptionPatchDto {
-    private String frequency;
+    private FrequencyDto frequency;
 }

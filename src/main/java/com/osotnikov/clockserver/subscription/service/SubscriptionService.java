@@ -1,4 +1,4 @@
-package com.osotnikov.subscription.service;
+package com.osotnikov.clockserver.subscription.service;
 
 
 import org.springframework.stereotype.Service;

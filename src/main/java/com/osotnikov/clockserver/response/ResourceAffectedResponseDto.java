@@ -1,4 +1,4 @@
-package com.osotnikov.response;
+package com.osotnikov.clockserver.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

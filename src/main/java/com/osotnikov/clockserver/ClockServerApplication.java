@@ -1,4 +1,4 @@
-package com.osotnikov;
+package com.osotnikov.clockserver;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

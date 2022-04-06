@@ -1,18 +1,18 @@
-package com.osotnikov.subscription.controller;
+package com.osotnikov.clockserver.subscription.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.osotnikov.subscription.controller.dto.SubscriptionDto;
-import com.osotnikov.subscription.service.SubscriptionService;
+import com.osotnikov.clockserver.subscription.controller.dto.FrequencyDto;
+import com.osotnikov.clockserver.subscription.controller.dto.SubscriptionDto;
+import com.osotnikov.clockserver.subscription.service.SubscriptionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -39,15 +39,30 @@ public class SubscriptionControllerTest {
 
     @Test
     public void givenXXXX_whenUserCreatesNewSubscription_then201() throws Exception {
-        SubscriptionDto subscriptionDto = new SubscriptionDto("http://some.postback/url", "5m2s");
+        SubscriptionDto subscriptionDto = new SubscriptionDto("http://some.postback/url",
+            new FrequencyDto(1, 5, 2));
 
-        MvcResult result = this.mockMvc.perform(
+        this.mockMvc.perform(
             post("/subscription")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectWriter.writeValueAsString(subscriptionDto)))
             .andDo(print())
             .andExpect(status().isCreated())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    public void givenInvalidFrequency_whenUserCreatesNewSubscription_then400() throws Exception {
+        SubscriptionDto subscriptionDto = new SubscriptionDto("http://some.postback/url",
+            new FrequencyDto(0, 0, 2));
+
+        this.mockMvc.perform(
+            post("/subscription")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectWriter.writeValueAsString(subscriptionDto)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andReturn();
+            .andExpect(content().json("{}"));
     }
 }
