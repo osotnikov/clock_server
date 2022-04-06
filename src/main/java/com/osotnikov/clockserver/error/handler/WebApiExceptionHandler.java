@@ -36,16 +36,6 @@ public class WebApiExceptionHandler {
                 apiError, new HttpHeaders(), apiError.getStatus());
     }
 
-    /*@ExceptionHandler({MethodArgumentNotValidException.class})
-    public ResponseEntity<ApiError> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, WebRequest request) {
-
-        String errorMessage = String.format("Invalid argument submitted: %s", ex.getParameter().getParameterName());
-        ApiError apiError =
-            new ApiError(HttpStatus.BAD_REQUEST, errorMessage, errorMessage);
-        return new ResponseEntity<>(
-            apiError, new HttpHeaders(), apiError.getStatus());
-    }*/
-
     @ExceptionHandler({Exception.class})
     public ResponseEntity<Object> handleAnyUnhandledException(Exception ex, WebRequest request) {
         ApiError apiError =
