@@ -1,0 +1,72 @@
+plugins {
+	id 'org.springframework.boot' version '2.5.0'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+	id 'com.adarshr.test-logger' version '3.0.0'
+	id 'application'
+}
+
+group = 'com.osotnikov'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+		testImplementation.exclude group: "ch.qos.logback", module: "logback-classic"
+	}
+
+	integrationTestImplementation.extendsFrom testImplementation
+	integrationRuntime.extendsFrom testRuntime
+}
+
+repositories {
+	mavenCentral()
+}
+
+sourceSets {
+	integrationTest {
+		java {
+			compileClasspath += main.output + test.output
+			runtimeClasspath += main.output + test.output
+			srcDir file('src/integration-test/java')
+		}
+		resources.srcDir file('src/integration-test/resources')
+	}
+}
+
+dependencies {
+	compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
+	annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
+	implementation 'org.gavaghan:geodesy:1.1.3'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '2.5.0'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.5.0'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation "org.mapstruct:mapstruct:1.4.2.Final"
+	annotationProcessor "org.mapstruct:mapstruct-processor:1.4.2.Final"
+	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '3.0.3'
+
+	testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.5.0'
+	testImplementation group: 'uk.org.lidalia', name: 'slf4j-test', version: '1.2.0'
+	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.1'
+	testImplementation group: 'com.squareup.okhttp3', name: 'mockwebserver', version: '4.9.1'
+
+	integrationTestImplementation "org.awaitility:awaitility:4.1.0"
+}
+
+test {
+	useJUnitPlatform()
+}
+
+task integrationTest(type: Test) {
+	description = "Run integration tests."
+	group = "verification"
+	useJUnitPlatform()
+
+	testClassesDirs = sourceSets.integrationTest.output.classesDirs
+	classpath = sourceSets.integrationTest.runtimeClasspath
+	outputs.upToDateWhen { false }
+	shouldRunAfter test
+}
+
+check.dependsOn integrationTest
