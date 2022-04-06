@@ -11,7 +11,7 @@ import static java.lang.annotation.RetentionPolicy.*;
 @Target( { ElementType.METHOD, ElementType.FIELD })
 @Retention(RUNTIME)
 public @interface PostbackFrequencyConstraint {
-	String message() default "Invalid phone number";
+	String message() default "Invalid frequency object. Must be between 5 seconds and 4 hours.";
 	Class<?>[] groups() default {};
 	Class<? extends Payload>[] payload() default {};
 }

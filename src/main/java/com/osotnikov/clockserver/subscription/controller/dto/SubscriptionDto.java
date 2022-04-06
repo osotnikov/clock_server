@@ -1,5 +1,6 @@
 package com.osotnikov.clockserver.subscription.controller.dto;
 
+import com.osotnikov.clockserver.subscription.controller.validation.PostbackFrequencyConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +13,6 @@ import lombok.NoArgsConstructor;
 public class SubscriptionDto {
     //@Pattern(regexp = "")
     private String postbackUrl;
-    // min 5s max 4h
+    @PostbackFrequencyConstraint
     private FrequencyDto frequency;
 }
