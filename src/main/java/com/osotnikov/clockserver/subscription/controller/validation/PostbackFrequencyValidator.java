@@ -18,7 +18,8 @@ public class PostbackFrequencyValidator implements ConstraintValidator<PostbackF
 		if((frequencyString.getHours() < 0 || frequencyString.getMinutes() < 0 || frequencyString.getSeconds() < 0) ||
 		   (frequencyString.getHours() > 4) ||
 		   (frequencyString.getHours() == 4 && (frequencyString.getMinutes() > 0 || frequencyString.getSeconds() > 0)) ||
-		   (frequencyString.getHours() == 0 && frequencyString.getMinutes() == 0 && frequencyString.getSeconds() < 5)) {
+		   (frequencyString.getHours() == 0 && frequencyString.getMinutes() == 0 && frequencyString.getSeconds() < 5) ||
+		   (frequencyString.getMinutes() > 59 || frequencyString.getSeconds() > 59)) {
 			return false;
 		}
 		return true;
