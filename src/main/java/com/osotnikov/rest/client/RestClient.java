@@ -1,16 +1,11 @@
 package com.osotnikov.rest.client;
 
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Response;
 import org.apache.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import java.util.Collections;
 
 /**
  * Abstracts the logic to make remote rest requests
@@ -35,13 +30,19 @@ public class RestClient<T> {
 	 * Ideally it should map to a ResponseDto that's independent of underlying implementation.
 	 * */
 	public boolean postAndIgnoreResponseBody(String uri, T bodyContent) {
-		ResponseEntity<Void> r = webClient
-			.post()
-			.uri(uri)
-			.bodyValue(bodyContent)
-			.retrieve()
-			.toBodilessEntity()
-			.block();
-		return !r.getStatusCode().isError();
+		try {
+			ResponseEntity<Void> r = webClient
+				.post()
+				.uri(uri)
+				.bodyValue(bodyContent)
+				.retrieve()
+				.toBodilessEntity()
+				.block();
+			return !r.getStatusCode().isError();
+		} catch (Exception e) {
+			// on 500 internal ClientHttpConnector throws an exception hence we need the catch, known bug cannot handle
+			// in async stream with onErrorContinue ...
+			return false;
+		}
 	}
 }

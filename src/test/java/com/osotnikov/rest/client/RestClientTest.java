@@ -15,8 +15,7 @@ import org.junit.jupiter.api.parallel.Execution;
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.parallel.ExecutionMode.SAME_THREAD;
 
 @Execution(SAME_THREAD) // just in case parallel execution is configured as default in the future, make this test an exception
@@ -41,7 +40,7 @@ public class RestClientTest {
 	}
 
 	@Test
-	void givenPostCalledWithCurrentTimeDto_whenPostCalled_thenSuccessAndValidJsonWasPostedAndResponseBodyIgnored() throws Exception {
+	void givenPostCalledWithValidDataAndRemoteOK_whenPostCalled_thenSuccessAndValidJsonWasPostedAndResponseBodyIgnored() throws Exception {
 
 		String expectedPostbackUrl = String.format(MOCK_BASE_URL, mockWebServer.getPort());
 
@@ -62,6 +61,28 @@ public class RestClientTest {
 		String postedTimeStr = request.getBody().readUtf8();
 		CurrentTimeDto postedTimeCurrentDto = objectMapper.readValue(postedTimeStr, CurrentTimeDto.class);
 		assertEquals(expectedTimeStr, postedTimeCurrentDto.getCurrentTime());
+	}
+
+	@Test
+	void givenPostCalledWithValidDataAndRemote500_whenPostCalled_thenFalseIsReturned() throws Exception {
+
+		String expectedPostbackUrl = String.format(MOCK_BASE_URL, mockWebServer.getPort());
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		mockWebServer.enqueue(new MockResponse()
+			.setResponseCode(500)
+			.setBody(objectMapper.writeValueAsString(new DummyResponse("some response message")))
+			.addHeader("Content-Type", "application/json"));
+
+		String expectedTimeStr = "2022-06-05 16:30:06";
+		boolean success = restClient.postAndIgnoreResponseBody(expectedPostbackUrl, new CurrentTimeDto(expectedTimeStr));
+
+		assertFalse(success);
+		RecordedRequest request = mockWebServer.takeRequest();
+		assertThat(request.getMethod()).isEqualTo("POST");
+		assertEquals("localhost", request.getRequestUrl().host().replace("127.0.0.1", "localhost"));
+		assertEquals(mockWebServer.getPort(), request.getRequestUrl().port());
+		assertEquals("http", request.getRequestUrl().scheme());
 	}
 
 	@Data
