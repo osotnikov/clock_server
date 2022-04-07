@@ -45,7 +45,8 @@ public class SubscriptionControllerTest {
                 .content(objectWriter.writeValueAsString(subscriptionDto)))
             .andDo(print())
             .andExpect(status().isCreated())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().json("{\"name\":\"http://some.postback/url\"}"));
     }
 
     @Test
@@ -60,37 +61,9 @@ public class SubscriptionControllerTest {
             .andDo(print())
             .andExpect(status().isBadRequest())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(content().json("{}"));
-    }
-
-    @Test
-    public void givenInvalidFrequencyOverMax_whenUserCreatesNewSubscription_then400() throws Exception {
-        SubscriptionDto subscriptionDto = new SubscriptionDto("http://some.postback/url",
-            new FrequencyDto(4, 0, 2));
-
-        this.mockMvc.perform(
-                post("/subscription")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectWriter.writeValueAsString(subscriptionDto)))
-            .andDo(print())
-            .andExpect(status().isBadRequest())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(content().json("{}"));
-    }
-
-    @Test
-    public void givenInvalidFrequencyNegative_whenUserCreatesNewSubscription_then400() throws Exception {
-        SubscriptionDto subscriptionDto = new SubscriptionDto("http://some.postback/url",
-            new FrequencyDto(3, -2, 6));
-
-        this.mockMvc.perform(
-                post("/subscription")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectWriter.writeValueAsString(subscriptionDto)))
-            .andDo(print())
-            .andExpect(status().isBadRequest())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(content().json("{}"));
+            .andExpect(content().json("{}"))
+            .andExpect(content().json("{\"status\":\"BAD_REQUEST\",\"message\":\"Invalid request body.\"," +
+                "\"errors\":[\"Invalid frequency object. Must be between 5 seconds and 4 hours.\"]}"));
     }
 
     @Test
@@ -105,6 +78,7 @@ public class SubscriptionControllerTest {
             .andDo(print())
             .andExpect(status().isBadRequest())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(content().json("{}"));
+            .andExpect(content().json("{\"status\":\"BAD_REQUEST\"," +
+                "\"message\":\"Invalid request body.\",\"errors\":[\"must be a valid URL\"]}"));;
     }
 }
