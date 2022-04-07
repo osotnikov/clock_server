@@ -1,5 +1,6 @@
 package com.osotnikov.clockserver.subscription.api;
 
+import com.osotnikov.clockserver.api.error.model.ApiError;
 import com.osotnikov.clockserver.subscription.api.dto.request.SubscriptionDto;
 import com.osotnikov.clockserver.subscription.service.SubscriptionService;
 import lombok.extern.slf4j.Slf4j;
@@ -28,10 +29,19 @@ public class SubscriptionController {
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,
                  consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ResourceAffectedResponseDto> createSubscription(
+    public ResponseEntity<?> createSubscription(
             @Valid @RequestBody SubscriptionDto subscriptionDto) {
-
         log.debug("Received: " + subscriptionDto.toString());
+
+        // This error logic is specific to this endpoint and can be argued that it's not an exceptional condition therefore
+        // error logic is based on return value.
+        boolean subscriptionCreated = subscriptionService.schedule(subscriptionDto);
+        if(!subscriptionCreated) {
+            ApiError apiError = new ApiError(HttpStatus.CONFLICT, "Conflicting resource exists.",
+                String.format("Resource with name: %s already exists.", subscriptionDto.getPostbackUrl()));
+            return new ResponseEntity<>(apiError, HttpStatus.CONFLICT);
+        }
+
         return new ResponseEntity<>(
             new ResourceAffectedResponseDto(subscriptionDto.getPostbackUrl()), HttpStatus.CREATED);
     }

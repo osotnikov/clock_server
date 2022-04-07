@@ -14,6 +14,9 @@ public class ClockServerApplication {
 		SpringApplication.run(ClockServerApplication.class, args);
 	}
 
+	/**
+	 * Should be in a separate class but I wanted to check whether putting it in the main class would create problems.
+	 * */
 	@Bean
 	public ThreadPoolTaskScheduler threadPoolTaskScheduler(){
 		ThreadPoolTaskScheduler threadPoolTaskScheduler

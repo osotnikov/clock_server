@@ -24,8 +24,11 @@ public class SubscriptionService {
 		this.taskScheduler = taskScheduler;
 	}
 
-	public void schedule(SubscriptionDto subscriptionDto) {
-
+	/**
+	 * @returns: false if there is already a schedule for this subscription request, true if it is successfully created
+	 * */
+	public boolean schedule(SubscriptionDto subscriptionDto) {
+		return false;
 	}
 
 }
