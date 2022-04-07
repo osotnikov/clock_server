@@ -1,4 +1,4 @@
-package com.osotnikov.clock_server.controller;
+package com.osotnikov.clockserver.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.osotnikov.clockserver.subscription.api.dto.request.FrequencyDto;

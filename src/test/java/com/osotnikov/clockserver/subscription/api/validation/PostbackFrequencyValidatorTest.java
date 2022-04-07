@@ -18,7 +18,7 @@ public class PostbackFrequencyValidatorTest {
 	private PostbackFrequencyValidator postbackFrequencyValidator = new PostbackFrequencyValidator();
 
 	@ParameterizedTest()
-	@MethodSource("com.osotnikov.clockserver.subscription.controller.validation.PostbackFrequencyValidatorTest#invalidFrequencyDto")
+	@MethodSource("com.osotnikov.clockserver.subscription.api.validation.PostbackFrequencyValidatorTest#invalidFrequencyDto")
 	public void givenInvalidFrequencyDtos_whenIsValidCalled_thenReturnsFalse(FrequencyDto frequencyDto) {
 		assertFalse(postbackFrequencyValidator.isValid(frequencyDto, null));
 	}
@@ -40,7 +40,7 @@ public class PostbackFrequencyValidatorTest {
 	}
 
 	@ParameterizedTest(name = "{1}")
-	@MethodSource("com.osotnikov.clockserver.subscription.controller.validation.PostbackFrequencyValidatorTest#validFrequencyDto")
+	@MethodSource("com.osotnikov.clockserver.subscription.api.validation.PostbackFrequencyValidatorTest#validFrequencyDto")
 	public void givenValidFrequencyDtos_whenIsValidCalled_thenReturnsTrue(FrequencyDto frequencyDto) {
 		assertTrue(postbackFrequencyValidator.isValid(frequencyDto, null));
 	}

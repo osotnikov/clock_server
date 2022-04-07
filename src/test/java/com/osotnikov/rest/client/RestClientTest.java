@@ -30,7 +30,7 @@ public class RestClientTest {
 	static void setUp() throws IOException {
 		mockWebServer = new MockWebServer();
 		mockWebServer.start();
-		restClient = new RestClient(CurrentTimeDto.class);
+		restClient = new RestClient();
 	}
 
 	@AfterAll
