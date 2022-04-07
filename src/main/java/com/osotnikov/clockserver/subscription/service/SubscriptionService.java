@@ -31,4 +31,11 @@ public class SubscriptionService {
 		return false;
 	}
 
+	/**
+	 * @returns: false if there was no subscription for the given name, true if it is successfully deleted
+	 * */
+	public boolean delete(String name) {
+		return false;
+	}
+
 }

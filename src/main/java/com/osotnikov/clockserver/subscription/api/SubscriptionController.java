@@ -1,6 +1,7 @@
 package com.osotnikov.clockserver.subscription.api;
 
 import com.osotnikov.clockserver.api.error.model.ApiError;
+import com.osotnikov.clockserver.subscription.api.dto.request.SubscriptionDeleteDto;
 import com.osotnikov.clockserver.subscription.api.dto.request.SubscriptionDto;
 import com.osotnikov.clockserver.subscription.service.SubscriptionService;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +30,7 @@ public class SubscriptionController {
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,
                  consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createSubscription(
-            @Valid @RequestBody SubscriptionDto subscriptionDto) {
+    public ResponseEntity<?> createSubscription(@Valid @RequestBody SubscriptionDto subscriptionDto) {
         log.debug("Received: " + subscriptionDto.toString());
 
         // This error logic is specific to this endpoint and can be argued that it's not an exceptional condition therefore
@@ -44,5 +44,20 @@ public class SubscriptionController {
 
         return new ResponseEntity<>(
             new ResourceAffectedResponseDto(subscriptionDto.getPostbackUrl()), HttpStatus.CREATED);
+    }
+
+    @DeleteMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> deleteSubscription(@Valid @RequestBody SubscriptionDeleteDto subscriptionDeleteDto) {
+        log.debug("Received: " + subscriptionDeleteDto.toString());
+
+        boolean subscriptionDeleted = subscriptionService.delete(subscriptionDeleteDto.getName());
+        if(!subscriptionDeleted) {
+            ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, "No resource exists.",
+                String.format("Resource with name: %s does not exist.", subscriptionDeleteDto.getName()));
+            return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(
+            new ResourceAffectedResponseDto(subscriptionDeleteDto.getName()), HttpStatus.OK);
     }
 }
