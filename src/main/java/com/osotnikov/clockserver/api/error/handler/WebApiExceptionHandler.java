@@ -1,6 +1,6 @@
-package com.osotnikov.clockserver.error.handler;
+package com.osotnikov.clockserver.api.error.handler;
 
-import com.osotnikov.clockserver.error.model.ApiError;
+import com.osotnikov.clockserver.api.error.model.ApiError;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,9 +1,9 @@
 package com.osotnikov.clock_server.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.osotnikov.clockserver.subscription.controller.dto.FrequencyDto;
-import com.osotnikov.clockserver.subscription.controller.dto.SubscriptionDto;
-import com.osotnikov.clockserver.subscription.controller.dto.SubscriptionPatchDto;
+import com.osotnikov.clockserver.subscription.api.dto.request.FrequencyDto;
+import com.osotnikov.clockserver.subscription.api.dto.request.SubscriptionDto;
+import com.osotnikov.clockserver.subscription.api.dto.request.SubscriptionPatchDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

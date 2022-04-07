@@ -1,4 +1,4 @@
-package com.osotnikov.clockserver.error.model;
+package com.osotnikov.clockserver.api.error.model;
 
 import lombok.Data;
 import org.springframework.http.HttpStatus;

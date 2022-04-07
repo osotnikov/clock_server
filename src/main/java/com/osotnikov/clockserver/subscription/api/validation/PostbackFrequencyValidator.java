@@ -1,6 +1,6 @@
-package com.osotnikov.clockserver.subscription.controller.validation;
+package com.osotnikov.clockserver.subscription.api.validation;
 
-import com.osotnikov.clockserver.subscription.controller.dto.FrequencyDto;
+import com.osotnikov.clockserver.subscription.api.dto.request.FrequencyDto;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

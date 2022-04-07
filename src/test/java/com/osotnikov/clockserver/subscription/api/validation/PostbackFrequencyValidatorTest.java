@@ -1,7 +1,6 @@
-package com.osotnikov.clockserver.subscription.controller.validation;
+package com.osotnikov.clockserver.subscription.api.validation;
 
-import com.osotnikov.clockserver.subscription.controller.dto.FrequencyDto;
-import org.junit.jupiter.api.Test;
+import com.osotnikov.clockserver.subscription.api.dto.request.FrequencyDto;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

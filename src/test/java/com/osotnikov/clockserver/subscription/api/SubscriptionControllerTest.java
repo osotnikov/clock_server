@@ -1,11 +1,11 @@
-package com.osotnikov.clockserver.subscription.controller;
+package com.osotnikov.clockserver.subscription.api;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.osotnikov.clockserver.subscription.controller.dto.FrequencyDto;
-import com.osotnikov.clockserver.subscription.controller.dto.SubscriptionDto;
+import com.osotnikov.clockserver.subscription.api.dto.request.FrequencyDto;
+import com.osotnikov.clockserver.subscription.api.dto.request.SubscriptionDto;
 import com.osotnikov.clockserver.subscription.service.SubscriptionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

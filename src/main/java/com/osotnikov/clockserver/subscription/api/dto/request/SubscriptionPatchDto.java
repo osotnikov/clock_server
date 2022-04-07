@@ -1,4 +1,4 @@
-package com.osotnikov.clockserver.subscription.controller.dto;
+package com.osotnikov.clockserver.subscription.api.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

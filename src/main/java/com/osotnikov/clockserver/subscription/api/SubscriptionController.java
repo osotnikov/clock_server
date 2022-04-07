@@ -1,6 +1,6 @@
-package com.osotnikov.clockserver.subscription.controller;
+package com.osotnikov.clockserver.subscription.api;
 
-import com.osotnikov.clockserver.subscription.controller.dto.SubscriptionDto;
+import com.osotnikov.clockserver.subscription.api.dto.request.SubscriptionDto;
 import com.osotnikov.clockserver.subscription.service.SubscriptionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import com.osotnikov.clockserver.response.ResourceAffectedResponseDto;
+import com.osotnikov.clockserver.subscription.api.dto.response.ResourceAffectedResponseDto;
 
 import javax.validation.Valid;
 

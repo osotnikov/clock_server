@@ -1,6 +1,6 @@
-package com.osotnikov.clockserver.subscription.controller.dto;
+package com.osotnikov.clockserver.subscription.api.dto.request;
 
-import com.osotnikov.clockserver.subscription.controller.validation.PostbackFrequencyConstraint;
+import com.osotnikov.clockserver.subscription.api.validation.PostbackFrequencyConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

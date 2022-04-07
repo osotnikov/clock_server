@@ -1,4 +1,4 @@
-package com.osotnikov.clockserver.response;
+package com.osotnikov.clockserver.subscription.api.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ResourceAffectedResponseDto {
-    private String name;
+public class FrequencyDto {
+	private int hours;
+	private int minutes;
+	private int seconds;
 }

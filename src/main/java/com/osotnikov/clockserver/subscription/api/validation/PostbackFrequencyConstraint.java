@@ -1,4 +1,4 @@
-package com.osotnikov.clockserver.subscription.controller.validation;
+package com.osotnikov.clockserver.subscription.api.validation;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

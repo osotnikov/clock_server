@@ -49,6 +49,7 @@ dependencies {
 	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-contract-stub-runner', version: '3.0.3'
 
 	testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.5.0'
+	testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.22.0'
 	testImplementation group: 'uk.org.lidalia', name: 'slf4j-test', version: '1.2.0'
 	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.1'
 	testImplementation group: 'com.squareup.okhttp3', name: 'mockwebserver', version: '4.9.1'
