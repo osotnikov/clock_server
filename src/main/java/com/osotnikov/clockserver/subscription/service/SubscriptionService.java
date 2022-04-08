@@ -2,6 +2,7 @@ package com.osotnikov.clockserver.subscription.service;
 
 
 import com.osotnikov.clockserver.subscription.api.dto.request.SubscriptionDto;
+import com.osotnikov.clockserver.subscription.api.dto.request.SubscriptionPatchDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,13 @@ public class SubscriptionService {
 	 * @returns: false if there was no subscription for the given name, true if it is successfully deleted
 	 * */
 	public boolean delete(String name) {
+		return false;
+	}
+
+	/**
+	 * @returns: false if there was no subscription for the given name, true if it is successfully changed
+	 * */
+	public boolean changeSchedule(SubscriptionPatchDto subscriptionDto) {
 		return false;
 	}
 

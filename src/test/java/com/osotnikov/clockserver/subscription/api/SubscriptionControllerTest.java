@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.osotnikov.clockserver.subscription.api.dto.request.FrequencyDto;
 import com.osotnikov.clockserver.subscription.api.dto.request.SubscriptionDeleteDto;
 import com.osotnikov.clockserver.subscription.api.dto.request.SubscriptionDto;
+import com.osotnikov.clockserver.subscription.api.dto.request.SubscriptionPatchDto;
 import com.osotnikov.clockserver.subscription.service.SubscriptionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -41,7 +41,7 @@ public class SubscriptionControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    public void givenPostAndExistingSubscription_whenUserCreatesNewSubscription_then201() throws Exception {
+    public void givenExistingSubscription_whenUserCreatesNewSubscription_then201() throws Exception {
 
         SubscriptionDto subscriptionDto = new SubscriptionDto(VALID_POSTBACK_URL,
             new FrequencyDto(1, 5, 2));
@@ -58,7 +58,7 @@ public class SubscriptionControllerTest {
     }
 
     @Test
-    public void givenPostAndNonExistingSubscription_whenUserCreatesNewSubscription_then401() throws Exception {
+    public void givenNonExistingSubscription_whenUserCreatesNewSubscription_then401() throws Exception {
         SubscriptionDto subscriptionDto = new SubscriptionDto(VALID_POSTBACK_URL,
             new FrequencyDto(0, 0, 6));
         given(subscriptionService.schedule(subscriptionDto)).willReturn(false);
@@ -75,7 +75,7 @@ public class SubscriptionControllerTest {
     }
 
     @Test
-    public void givenPostAndInvalidFrequencyUnderMin_whenUserCreatesNewSubscription_then400() throws Exception {
+    public void givenInvalidFrequencyUnderMin_whenUserCreatesNewSubscription_then400() throws Exception {
         SubscriptionDto subscriptionDto = new SubscriptionDto(VALID_POSTBACK_URL,
             new FrequencyDto(0, 0, 2));
 
@@ -91,7 +91,7 @@ public class SubscriptionControllerTest {
     }
 
     @Test
-    public void givenPostAndInvalidPostbackUrl_whenUserCreatesNewSubscription_then400() throws Exception {
+    public void givenInvalidPostbackUrl_whenUserCreatesNewSubscription_then400() throws Exception {
         SubscriptionDto subscriptionDto = new SubscriptionDto(INVALID_POSTBACK_URL,
             new FrequencyDto(0, 0, 6));
 
@@ -107,7 +107,7 @@ public class SubscriptionControllerTest {
     }
 
     @Test
-    public void givenPostAndInvalidPostbackUrlAndInvalidFrequency_whenUserCreatesNewSubscription_then400() throws Exception {
+    public void givenInvalidPostbackUrlAndInvalidFrequency_whenUserCreatesNewSubscription_then400() throws Exception {
         SubscriptionDto subscriptionDto = new SubscriptionDto(INVALID_POSTBACK_URL,
             new FrequencyDto(0, 0, 4));
 
@@ -126,7 +126,7 @@ public class SubscriptionControllerTest {
     }
 
     @Test
-    public void givenDeleteExistingSubscriptionAndValidUrl_whenDelete_then200() throws Exception {
+    public void givenExistingSubscriptionAndValidUrl_whenDelete_then200() throws Exception {
 
         SubscriptionDeleteDto subscriptionDeleteDto = new SubscriptionDeleteDto(VALID_POSTBACK_URL);
         given(subscriptionService.delete(VALID_POSTBACK_URL)).willReturn(true);
@@ -142,7 +142,7 @@ public class SubscriptionControllerTest {
     }
 
     @Test
-    public void givenDeleteNonExistingSubscriptionAndValidUrl_whenDelete_then404() throws Exception {
+    public void givenNonExistingSubscriptionAndValidUrl_whenDelete_then404() throws Exception {
 
         SubscriptionDeleteDto subscriptionDeleteDto = new SubscriptionDeleteDto(VALID_POSTBACK_URL);
         given(subscriptionService.delete(VALID_POSTBACK_URL)).willReturn(false);
@@ -160,7 +160,7 @@ public class SubscriptionControllerTest {
     }
 
     @Test
-    public void givenDeleteExistingSubscriptionAndInvalidUrl_whenDelete_then400() throws Exception {
+    public void givenExistingSubscriptionAndInvalidUrl_whenDelete_then400() throws Exception {
         SubscriptionDeleteDto subscriptionDto = new SubscriptionDeleteDto(INVALID_POSTBACK_URL);
         given(subscriptionService.delete(VALID_POSTBACK_URL)).willReturn(true);
 
@@ -173,6 +173,55 @@ public class SubscriptionControllerTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(content().json("{\"status\":\"BAD_REQUEST\"," +
                 "\"message\":\"Invalid request body.\",\"errors\":[\"must be a valid URL\"]}"));
+    }
+
+    @Test
+    public void givenExistingSubscriptionAndValidArgs_whenPatch_then201() throws Exception {
+        SubscriptionPatchDto subscriptionPatchDto = new SubscriptionPatchDto(VALID_POSTBACK_URL,
+            new FrequencyDto(1, 5, 2));
+        given(subscriptionService.changeSchedule(subscriptionPatchDto)).willReturn(true);
+
+        this.mockMvc.perform(
+                patch("/subscription")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectWriter.writeValueAsString(subscriptionPatchDto)))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().json(String.format("{\"name\":\"%s\"}", VALID_POSTBACK_URL)));
+    }
+
+    @Test
+    public void givenNonExistingSubscriptionAndValidArgs_whenPatch_then404() throws Exception {
+        SubscriptionPatchDto subscriptionPatchDto = new SubscriptionPatchDto(VALID_POSTBACK_URL,
+            new FrequencyDto(0, 0, 6));
+        given(subscriptionService.changeSchedule(subscriptionPatchDto)).willReturn(false);
+
+        this.mockMvc.perform(
+                patch("/subscription")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectWriter.writeValueAsString(subscriptionPatchDto)))
+            .andDo(print())
+            .andExpect(status().isNotFound())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().json(String.format("{\"status\":\"NOT_FOUND\",\"message\":\"No resource exists.\"," +
+                "\"errors\":[\"Resource with name: %s does not exist.\"]}", VALID_POSTBACK_URL)));
+    }
+
+    @Test
+    public void givenInvalidFrequencyAndInvalidName_whenPatch_then400() throws Exception {
+        SubscriptionPatchDto subscriptionPatchDto = new SubscriptionPatchDto(INVALID_POSTBACK_URL,
+            new FrequencyDto(0, 0, 2));
+
+        this.mockMvc.perform(
+                patch("/subscription")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectWriter.writeValueAsString(subscriptionPatchDto)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().json(" {\"status\":\"BAD_REQUEST\",\"message\":\"Invalid request body.\"," +
+                "\"errors\":[\"must be a valid URL\",\"Invalid frequency object. Must be between 5 seconds and 4 hours.\"]}"));
     }
 
 }
