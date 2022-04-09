@@ -23,7 +23,8 @@ import java.util.concurrent.ScheduledFuture;
 * If there will be a need not to use TaskScheduler, we could create our own scheduler and executor and provide them
 * as dependencies to this class which would change the implementation but not its API.
 *
-* As far as the concurrency is concerned care was taken to ensure that there will never be two concurrent schedules
+* As far as the concurrency is concerned the decision was to synchronize on the element level instead of the store/action
+* level which resulted in a more complex code. Care was taken to ensure that there will never be two concurrent schedules
 * for the same subscription, or a schedule for a deleted subscription. There are no other guarantees given for scenarios
 * with multiple different concurrent requests for the same subscription.
  * */
@@ -31,7 +32,7 @@ import java.util.concurrent.ScheduledFuture;
 public class SubscriptionService {
 
 	private final SubscriptionDtoMapper subscriptionDtoMapper;
-	private final SubscriptionRepository subscriptionRepository;
+	private final SubscriptionRepository subscriptionRepository; // any method calls in this service are atomic
 	private final TimePostbackRunnableFactory timePostbackRunnableFactory;
 	private final TaskScheduler taskScheduler;
 
@@ -49,20 +50,16 @@ public class SubscriptionService {
 	 * */
 	public boolean schedule(SubscriptionDto subscriptionDto) {
 		Subscription subscription = subscriptionDtoMapper.map(subscriptionDto);
-		subscription = subscriptionRepository.storeNew(subscription);
+		subscription = subscriptionRepository.storeNew(subscription); // atomic
 		if (subscription != null) {
-			return false;
+			return false; // subscription already exists
 		}
-		// subscription might have been deleted or changed before entering this synchronized block. "Changed" in this
-		// context means the instance might be the same or different, depending on whether just the schedule was changed
-		// or it was deleted and recreated.
-		synchronized(subscription) {
-			subscription = subscriptionRepository.get(subscription.getPostbackUrl());
-			if(subscription.getScheduledFuture() == null) {
-				scheduleSubscription(subscription);
-			}
-			return true;
-		}
+		// subscription has now been created with subscription.getScheduledFuture() == null, any deletes or patches
+		// that might have happened immediately after will not go through and any other creates will return from
+		// the "if" above (see delete and changeSchedule methods), therefore there is not need for a synchronized block
+		// here.
+		scheduleSubscription(subscription);
+		return true;
 	}
 
 	/**
@@ -70,16 +67,20 @@ public class SubscriptionService {
 	 * */
 	public boolean delete(String name) {
 		Subscription subscription = subscriptionRepository.get(name);
-		// subscription might have been changed before entering this synchronized block, that means scheduled feature
-		// reference might be stale
-		synchronized(subscription) {
-			// most recent subscription instance is returned though so reference to scheduled feature is correct
-			subscription = subscriptionRepository.deleteExisting(name);
-			if (subscription != null) {
-				cancelSubscription(subscription);
-				return true;
-			}
+		if(subscription == null) {
 			return false;
+		}
+		// subscription might have been changed before entering this synchronized block
+		synchronized(subscription) {
+			Subscription subscription2 = subscriptionRepository.get(name);
+			if(subscription != subscription2 || subscription.getScheduledFuture() == null) {
+				// If subscription.getScheduledFuture() has not been initialized don't consider this as an existing subscription
+				// since it is in the process of initialization.
+				return false;
+			}
+			subscriptionRepository.deleteExisting(name);
+			subscription.getScheduledFuture().cancel(false);
+			return true;
 		}
 	}
 
@@ -88,23 +89,27 @@ public class SubscriptionService {
 	 * */
 	public boolean changeSchedule(SubscriptionPatchDto subscriptionPatchDto) {
 		Subscription subscription = subscriptionRepository.get(subscriptionPatchDto.getName());
-		// subscription might have been deleted or changed before entering this synchronized block
+		if(subscription == null) {
+			return false;
+		}
+		// subscription might have been deleted or changed before entering this synchronized block, also it might not
+		// have been fully initialized.
 		synchronized (subscription) {
-			// if it was deleted we need to exit, if it's been changed we need the reference to the new scheduled feature
-			subscription = subscriptionRepository.get(subscriptionPatchDto.getName());
-			if(subscription == null) {
+			if(subscription.getScheduledFuture() == null) {
+				// If subscription.getScheduledFuture() has not been initialized don't consider this as an existing
+				// subscription since it is in the process of initialization.
 				return false;
 			}
-			cancelSubscription(subscription);
+			// if it was deleted or is just being created we need to exit, if it's been changed we need the reference
+			// to the new scheduled feature
+			Subscription subscription2 = subscriptionRepository.get(subscriptionPatchDto.getName());
+			if(subscription2 != subscription || subscription == null || subscription.getScheduledFuture() == null) {
+				return false;
+			}
+			subscription.getScheduledFuture().cancel(false);
 			subscription.setFrequency(subscriptionPatchDto.getFrequency());
 			scheduleSubscription(subscription);
 			return true;
-		}
-	}
-
-	private void cancelSubscription(Subscription subscription) {
-		if(subscription.getScheduledFuture() != null) {
-			subscription.getScheduledFuture().cancel(false);
 		}
 	}
 

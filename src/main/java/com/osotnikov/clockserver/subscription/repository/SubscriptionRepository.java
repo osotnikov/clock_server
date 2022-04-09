@@ -17,6 +17,9 @@ public class SubscriptionRepository {
 		return subscriptions.putIfAbsent(subscription.getPostbackUrl(), subscription);
 	}
 
+	/**
+	 * @return subscription that was removed, if there was no subscription returns null
+	 * */
 	public Subscription deleteExisting(String name) {
 		return subscriptions.remove(name);
 	}
