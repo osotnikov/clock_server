@@ -16,7 +16,7 @@ public class TimePostbackRunnableFactory {
 	}
 
 	public TimePostbackRunnable createRunnable(String postbackUrl) {
-		return new TimePostbackRunnable(postbackUrl);
+		return new TimePostbackRunnable(postbackUrl, restClient);
 	}
 
 }
