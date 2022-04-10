@@ -50,13 +50,13 @@ public class SubscriptionService {
 	 * */
 	public boolean schedule(SubscriptionDto subscriptionDto) {
 		Subscription subscription = subscriptionDtoMapper.map(subscriptionDto);
-		subscription = subscriptionRepository.storeNew(subscription); // atomic
-		if (subscription != null) {
+		Subscription subscription2 = subscriptionRepository.storeNew(subscription); // atomic
+		if (subscription2 != null) {
 			return false; // subscription already exists
 		}
 		// subscription has now been created with subscription.getScheduledFuture() == null, any deletes or patches
-		// that might have happened immediately after will not go through and any other creates will return from
-		// the "if" above (see delete and changeSchedule methods), therefore there is not need for a synchronized block
+		// that might happen immediately after will not go through and any other creates will return from
+		// the "if" above (see delete and changeSchedule methods), therefore there is no need for a synchronized block
 		// here.
 		scheduleSubscription(subscription);
 		return true;
@@ -70,7 +70,8 @@ public class SubscriptionService {
 		if(subscription == null) {
 			return false;
 		}
-		// subscription might have been changed before entering this synchronized block
+		// subscription might have been changed before entering this synchronized block, in that case it has already
+		// been deleted and recreated so this method just returns false since it is only synchronized on the initial value
 		synchronized(subscription) {
 			Subscription subscription2 = subscriptionRepository.get(name);
 			if(subscription != subscription2 || subscription.getScheduledFuture() == null) {
@@ -94,7 +95,7 @@ public class SubscriptionService {
 		}
 		// subscription might have been deleted or changed before entering this synchronized block, also it might not
 		// have been fully initialized.
-		synchronized (subscription) {
+		synchronized(subscription) {
 			if(subscription.getScheduledFuture() == null) {
 				// If subscription.getScheduledFuture() has not been initialized don't consider this as an existing
 				// subscription since it is in the process of initialization.
@@ -103,7 +104,10 @@ public class SubscriptionService {
 			// if it was deleted or is just being created we need to exit, if it's been changed we need the reference
 			// to the new scheduled feature
 			Subscription subscription2 = subscriptionRepository.get(subscriptionPatchDto.getName());
-			if(subscription2 != subscription || subscription == null || subscription.getScheduledFuture() == null) {
+			if(subscription2 != subscription) {
+				// different reference means subscription was deleted and recreated, could be argued that we still need
+				// to modify it but we're not synchronized on the new reference, therefore we just act as if the subscription
+				// does not exist and return false because this is an unlikely edge case anyway.
 				return false;
 			}
 			subscription.getScheduledFuture().cancel(false);
